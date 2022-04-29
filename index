@@ -1,0 +1,75 @@
+//DB Connection
+$dbServername = server;
+$dbUsername = user;
+$dbPassword = password;
+$dbName = database;
+
+$connect = mysqli_connect($dbServername, $dbUsername, $dbPassword, $dbName);
+
+//checks for connectivity
+if (mysqli_connect_error()) {
+  die("Not connected");
+}
+?>
+
+<html>  
+      <head>  
+           <title>Webslesson Tutorial</title> 
+           <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+     
+     <style>
+   
+   .box
+   {
+    width:750px;
+    padding:20px;
+    background-color:#fff;
+    border:1px solid #ccc;
+    border-radius:5px;
+    margin-top:100px;
+   }
+  </style>
+      </head>  
+      <body>  
+        <div class="container box">
+          <h3 align="center">Echo JSON From Webhook</h3><br />
+          <?php
+
+          $query = '';
+          $table_data = '';
+
+          $data = file_get_contents('php://input');       //Read the JSON file in PHP
+          $array = json_decode($json, true);              //Convert JSON String into PHP Array
+          
+        //Extract the Array Values by using Foreach Loop
+          foreach($array as $row){
+           $query .= "INSERT INTO json(name, fromPage, page_url) VALUES ('".$row["name"]."', '".$row["fromPage"]."', '".$row["page_url"]."'); ";  // Make Multiple Insert Query 
+           $table_data .= '
+      <tr>
+       <td>'.$row["name"].'</td>
+       <td>'.$row["fromPage"].'</td>
+       <td>'.$row["page_url"].'</td>
+      </tr>
+           '; //Data for display on Web page
+          }
+          if(mysqli_multi_query($connect, $query)) //Run Mutliple Insert Query
+    {
+     echo '<h3>Imported JSON Data</h3><br />';
+     echo '
+      <table class="table table-bordered">
+        <tr>
+         <th width="45%">name</th>
+         <th width="10%">fromPage</th>
+         <th width="45%">page_url</th>
+        </tr>
+     ';
+     echo $table_data;  
+     echo '</table>';
+          }
+
+          ?>
+     <br />
+         </div>  
+      </body>  
+ </html>  
